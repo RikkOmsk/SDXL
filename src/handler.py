@@ -26,7 +26,7 @@ def handler(job):
     print(f"Time taken: {time.time() - time_start}")
 
     buffer = io.BytesIO()
-    image.save(buffer, format="PNG")
+    image.save(buffer, format="JPEG")
     image_bytes = buffer.getvalue()
 
     print(f"Time taken taken+buffer: {time.time() - time_start}")
