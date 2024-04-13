@@ -11,7 +11,7 @@ import time
 # You will want models to be loaded into memory before starting serverless.
 
 try:
-    pipe = AutoPipelineForText2Image.from_pretrained("stabilityai/sdxl-turbo", torch_dtype=torch.float16, variant="fp16")
+    pipe = AutoPipelineForText2Image.from_pretrained("CalypsoCrunchies99/socababesTurboXL_v12Hybrid_vaefix", torch_dtype=torch.float16, variant="fp16")
     pipe.to("cuda")
 except RuntimeError:
     quit()
