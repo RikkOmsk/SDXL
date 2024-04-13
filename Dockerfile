@@ -17,16 +17,20 @@ RUN . /clone.sh CodeFormer https://github.com/sczhou/CodeFormer.git c5b4593074ba
 
 RUN . /clone.sh BLIP https://github.com/salesforce/BLIP.git 48211a1594f1321b00f14c9f7a5b4813144b2fb9 && \
     . /clone.sh k-diffusion https://github.com/crowsonkb/k-diffusion.git 5b3af030dd83e0297272d861c19477735d0317ec && \
-    . /clone.sh clip-interrogator https://github.com/pharmapsychotic/clip-interrogator 2486589f24165c8e3b303f84e9dbbea318df83e8
+    . /clone.sh clip-interrogator https://github.com/pharmapsychotic/clip-interrogator 2486589f24165c8e3b303f84e9dbbea318df83e8 && \
+    . /clone.sh generative-models https://github.com/Stability-AI/generative-models 45c443b316737a4ab6e40413d7794a7f5657c19f
 
-RUN wget -O /model.safetensors https://civitai.com/api/download/models/274815 -P /
-# ADD model.safetensors /
-# ADD model2.safetensors /
+RUN apk add --no-cache wget && \
+    wget -q -O /model.safetensors https://civitai.com/api/download/models/274815
+
+
 
 # ---------------------------------------------------------------------------- #
 #                        Stage 3: Build the final image                        #
 # ---------------------------------------------------------------------------- #
-FROM python:3.10.9-slim
+FROM python:3.10.9-slim as build_final_image
+
+ARG SHA=5ef669de080814067961f28357256e8fe27544f4
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_PREFER_BINARY=1 \
@@ -36,9 +40,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+RUN export COMMANDLINE_ARGS="--skip-torch-cuda-test --precision full --no-half"
+RUN export TORCH_COMMAND='pip install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/rocm5.6'
+
 RUN apt-get update && \
     apt install -y \
-    fonts-dejavu-core rsync git jq moreutils aria2 wget libgoogle-perftools-dev procps && \
+    fonts-dejavu-core rsync git jq moreutils aria2 wget libgoogle-perftools-dev procps libgl1 libglib2.0-0 && \
     apt-get autoremove -y && rm -rf /var/lib/apt/lists/* && apt-get clean -y
 
 RUN --mount=type=cache,target=/cache --mount=type=cache,target=/root/.cache/pip \
@@ -47,13 +54,11 @@ RUN --mount=type=cache,target=/cache --mount=type=cache,target=/root/.cache/pip 
 RUN --mount=type=cache,target=/root/.cache/pip \
     git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git && \
     cd stable-diffusion-webui && \
-    git reset --hard 89f9faa63388756314e8a1d96cf86bf5e0663045 && \
-    pip install -r requirements_versions.txt && \
-    pip install httpx==0.24.1 
+    git reset --hard ${SHA}
+#&& \ pip install -r requirements_versions.txt
 
 COPY --from=download /repositories/ ${ROOT}/repositories/
-COPY --from=download /model.safetensors /stable-diffusion-webui/models/Stable-diffusion/model.safetensors
-# COPY --from=download /model2.safetensors /stable-diffusion-webui/models/Stable-diffusion/model2.safetensors
+COPY --from=download /model.safetensors /model.safetensors
 RUN mkdir ${ROOT}/interrogate && cp ${ROOT}/repositories/clip-interrogator/data/* ${ROOT}/interrogate
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -r ${ROOT}/repositories/CodeFormer/requirements.txt
@@ -65,24 +70,16 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade -r /requirements.txt --no-cache-dir && \
     rm /requirements.txt
 
-ARG SHA=89f9faa63388756314e8a1d96cf86bf5e0663045
-RUN --mount=type=cache,target=/root/.cache/pip \
-    cd stable-diffusion-webui && \
-    git fetch && \
-    git reset --hard ${SHA} && \
-    pip install -r requirements_versions.txt
-
 ADD src .
 
 COPY builder/cache.py /stable-diffusion-webui/cache.py
-#RUN cd /stable-diffusion-webui && python cache.py --use-cpu=all --ckpt /stable-diffusion-webui/models/Stable-diffusion/model.safetensors
-RUN cd /stable-diffusion-webui
-
+RUN cd /stable-diffusion-webui && python cache.py --use-cpu=all --ckpt /model.safetensors
 
 # Cleanup section (Worker Template)
 RUN apt-get autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
 
+# Set permissions and specify the command to run
 RUN chmod +x /start.sh
 CMD /start.sh

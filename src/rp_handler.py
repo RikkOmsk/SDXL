@@ -4,6 +4,8 @@ import runpod
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
+LOCAL_URL = "http://127.0.0.1:3000/sdapi/v1"
+
 automatic_session = requests.Session()
 retries = Retry(total=10, backoff_factor=0.1, status_forcelist=[502, 503, 504])
 automatic_session.mount('http://', HTTPAdapter(max_retries=retries))
@@ -12,14 +14,13 @@ automatic_session.mount('http://', HTTPAdapter(max_retries=retries))
 # ---------------------------------------------------------------------------- #
 #                              Automatic Functions                             #
 # ---------------------------------------------------------------------------- #
-
 def wait_for_service(url):
     '''
     Check if the service is ready to receive requests.
     '''
     while True:
         try:
-            requests.get(url)
+            requests.get(url, timeout=120)
             return
         except requests.exceptions.RequestException:
             print("Service not ready yet. Retrying...")
@@ -29,43 +30,12 @@ def wait_for_service(url):
         time.sleep(0.2)
 
 
-def run_inference(params):
-    config = {
-        "baseurl": "http://127.0.0.1:3000",
-        "api": {
-            "txt2img":  ("POST", "/sdapi/v1/txt2img"),
-            "img2img":  ("POST", "/sdapi/v1/img2img"),
-            "getModels": ("GET", "/sdapi/v1/sd-models"),
-            "getOptions": ("GET", "/sdapi/v1/options"),
-            "setOptions": ("POST", "/sdapi/v1/options"),
-        },
-        "timeout": 600
-    }
-
-    api_name = params["api_name"]
-    path = None
-
-    if api_name in config["api"]:
-        api_config = config["api"][api_name]
-    else:
-        raise Exception("Method '%s' not yet implemented")
-
-    api_verb = api_config[0]
-    api_path = api_config[1]
-
-    response = {}
-
-    if api_verb == "GET":
-        response = automatic_session.get(
-                url='%s%s' % (config["baseurl"], api_path),
-                timeout=config["timeout"])
-
-    if api_verb == "POST":
-        response = automatic_session.post(
-                url='%s%s' % (config["baseurl"], api_path),
-                json=params, 
-                timeout=config["timeout"])
-
+def run_inference(inference_request):
+    '''
+    Run inference on a request.
+    '''
+    response = automatic_session.post(url=f'{LOCAL_URL}/txt2img',
+                                      json=inference_request, timeout=600)
     return response.json()
 
 
@@ -84,7 +54,7 @@ def handler(event):
 
 
 if __name__ == "__main__":
-    wait_for_service(url='http://127.0.0.1:3000/sdapi/v1/txt2img')
+    wait_for_service(url=f'{LOCAL_URL}/txt2img')
 
     print("WebUI API Service is ready. Starting RunPod...")
 
