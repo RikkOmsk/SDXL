@@ -1,7 +1,7 @@
 """ Example handler file. """
 
 import runpod
-from diffusers import AutoPipelineForText2Image
+from diffusers import StableDiffusionXLPipeline
 import torch
 import base64
 import io
@@ -11,7 +11,7 @@ import time
 # You will want models to be loaded into memory before starting serverless.
 
 try:
-    pipe = AutoPipelineForText2Image.from_pretrained("CalypsoCrunchies99/socababesTurboXL_v12Hybrid_vaefix", torch_dtype=torch.float16, variant="fp16")
+    pipe = StableDiffusionXLPipeline.from_pretrained("segmind/SSD-1B", torch_dtype=torch.float16, use_safetensors=True, variant="fp16")
     pipe.to("cuda")
 except RuntimeError:
     quit()
@@ -22,7 +22,7 @@ def handler(job):
     prompt = job_input['prompt']
 
     time_start = time.time()
-    image = pipe(prompt=prompt, height=1024, width=1024, num_inference_steps=8, guidance_scale=0.0).images[0]
+    image = pipe(prompt=prompt, height=1024, width=1024, num_inference_steps=20, guidance_scale=0.0).images[0]
     print(f"Time taken: {time.time() - time_start}")
 
     buffer = io.BytesIO()
