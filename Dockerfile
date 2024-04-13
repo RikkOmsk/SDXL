@@ -74,7 +74,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 ADD src .
 
 COPY builder/cache.py /stable-diffusion-webui/cache.py
-RUN cd /stable-diffusion-webui && python cache.py --use-cpu=all --ckpt /stable-diffusion-webui/models/Stable-diffusion/model.safetensors
+RUN cd /stable-diffusion-webui && python cache.py --use-cpu=all --safetensors /stable-diffusion-webui/models/Stable-diffusion/model.safetensors
 
 # Cleanup section (Worker Template)
 RUN apt-get autoremove -y && \
