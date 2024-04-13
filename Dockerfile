@@ -49,6 +49,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     cd stable-diffusion-webui && \
     git reset --hard 89f9faa63388756314e8a1d96cf86bf5e0663045 && \
     pip install -r requirements_versions.txt
+    pip install httpx==0.24.1 && \
 
 COPY --from=download /repositories/ ${ROOT}/repositories/
 COPY --from=download /model.safetensors /stable-diffusion-webui/models/Stable-diffusion/model.safetensors
