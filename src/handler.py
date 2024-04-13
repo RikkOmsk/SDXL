@@ -22,13 +22,14 @@ def handler(job):
     prompt = job_input['prompt']
 
     time_start = time.time()
-    image = pipe(prompt=prompt, height=1024, width=1024, num_inference_steps=20, guidance_scale=0.0).images[0]
+    image = pipe(prompt=prompt, height=1024, width=1024, num_inference_steps=25, guidance_scale=7.5).images[0]
     print(f"Time taken: {time.time() - time_start}")
 
     buffer = io.BytesIO()
-    image.save(buffer, format="PNG")
+    image.save(buffer, format="JPG")
     image_bytes = buffer.getvalue()
 
+    print(f"Time taken taken+buffer: {time.time() - time_start}")
     return base64.b64encode(image_bytes).decode('utf-8')
 
 
