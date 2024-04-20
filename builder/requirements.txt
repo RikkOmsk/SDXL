@@ -11,3 +11,4 @@ transformers
 accelerate
 safetensors
 hf_transfer
+torchsde
