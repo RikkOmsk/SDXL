@@ -1,7 +1,7 @@
 """ Example handler file. """
 
 import runpod
-from diffusers import DPMSolverSDEScheduler, StableDiffusionXLPipeline
+from diffusers import DPMSolverSinglestepScheduler, StableDiffusionXLPipeline
 import torch
 import base64
 import io
@@ -20,8 +20,8 @@ def handler(job):
     prompt = job_input['prompt']
 
     time_start = time.time()
-    common_config = {'beta_start': 0.00085, 'beta_end': 0.012, 'beta_schedule': 'scaled_linear'}
-    scheduler = DPMSolverSDEScheduler(**common_config)
+    common_config = {'beta_start': 0.00085, 'beta_end': 0.012, 'beta_schedule': 'scaled_linear', 'use_karras_sigmas': True}
+    scheduler = DPMSolverSinglestepScheduler(**common_config)
     pipe.scheduler = scheduler
     generator = torch.Generator(device="cuda").manual_seed(job_input['seed'])
     image = pipe(prompt=prompt, generator=generator, height=job_input['height'], width=job_input['width'], num_inference_steps=job_input['num_inference_steps'], guidance_scale=job_input['guidance_scale']).images[0]
