@@ -20,7 +20,7 @@ def handler(job):
     prompt = job_input['prompt']
 
     time_start = time.time()
-    common_config = {'beta_start': 0.00085, 'beta_end': 0.012, 'beta_schedule': 'scaled_linear', 'use_karras_sigmas': True}
+    common_config = {'beta_start': 0.00085, 'beta_end': 0.012, 'beta_schedule': 'scaled_linear'}
     scheduler = DPMSolverSDEScheduler(**common_config)
     pipe.scheduler = scheduler
     generator = torch.Generator(device="cuda").manual_seed(job_input['seed'])
