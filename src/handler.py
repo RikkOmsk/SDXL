@@ -12,7 +12,7 @@ import time
 
 try:
     # pipe = StableDiffusionXLPipeline.from_pretrained("segmind/SSD-1B", torch_dtype=torch.float16, use_safetensors=True, variant="fp16")
-    pipe = StableDiffusionXLPipeline.from_single_file("https://civitai.com/api/download/models/274815?type=Model&format=SafeTensor&size=full&fp=fp16", torch_dtype=torch.float16, use_safetensors=True, variant="fp16", add_watermarker=False)
+    pipe = StableDiffusionXLPipeline.from_single_file("model.safetensors", torch_dtype=torch.float16, use_safetensors=True, variant="fp16", add_watermarker=False)
     pipe.to("cuda")
 except RuntimeError:
     quit()
