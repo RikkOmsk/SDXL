@@ -7,11 +7,8 @@ import base64
 import io
 import time
 
-# If your handler runs inference on a model, load the model here.
-# You will want models to be loaded into memory before starting serverless.
 
 try:
-    # pipe = StableDiffusionXLPipeline.from_pretrained("segmind/SSD-1B", torch_dtype=torch.float16, use_safetensors=True, variant="fp16")
     pipe = StableDiffusionXLPipeline.from_single_file("model.safetensors", torch_dtype=torch.float16, use_safetensors=True, variant="fp16", add_watermarker=False)
     pipe.to("cuda")
 except RuntimeError:
@@ -23,7 +20,7 @@ def handler(job):
     prompt = job_input['prompt']
 
     time_start = time.time()
-    image = pipe(prompt=prompt, height=1024, width=1024, num_inference_steps=10, guidance_scale=2.0).images[0]
+    image = pipe(prompt=prompt, height=job_input['height'], width=job_input['width'], num_inference_steps=job_input['num_inference_steps'], guidance_scale=job_input['guidance_scale']).images[0]
     print(f"Time taken: {time.time() - time_start}")
 
     buffer = io.BytesIO()
