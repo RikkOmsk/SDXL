@@ -20,7 +20,8 @@ def handler(job):
     prompt = job_input['prompt']
 
     time_start = time.time()
-    image = pipe(prompt=prompt, height=job_input['height'], width=job_input['width'], num_inference_steps=job_input['num_inference_steps'], guidance_scale=job_input['guidance_scale']).images[0]
+    generator = torch.Generator(device="cuda").manual_seed(job_input['seed'])
+    image = pipe(prompt=prompt, generator=generator, height=job_input['height'], width=job_input['width'], num_inference_steps=job_input['num_inference_steps'], guidance_scale=job_input['guidance_scale']).images[0]
     print(f"Time taken: {time.time() - time_start}")
 
     buffer = io.BytesIO()
