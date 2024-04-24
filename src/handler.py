@@ -31,15 +31,15 @@ def handler(job):
     image.save(buffer, format="JPEG")
     image_bytes = buffer.getvalue()
 
-    print(f"Time taken taken+buffer: {time.time() - time_start}")
+
     # return base64.b64encode(image_bytes).decode('utf-8')
 
-    jpg = base64.b64encode(image_bytes).decode('utf-8')
+    # jpg = base64.b64encode(image_bytes).decode('utf-8')
     filename = "pic.jpg"
 
     temp_location = '/tmp/' + filename          #here
     with open(temp_location, "wb") as f:        
-        f.write(jpg)
+        f.write(image_bytes)
 
     storage_client = storage.Client()
     bucket = storage_client.get_bucket("face-swap-images")
