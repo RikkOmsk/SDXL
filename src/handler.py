@@ -41,7 +41,7 @@ def handler(job):
 
     storage_client = storage.Client()
     bucket = storage_client.get_bucket("face-swap-images")
-    outputFile = "SDXL/" + input['userID']" + "/"" + input['documentID'] + ".jpg"
+    outputFile = "SDXL/" + input['userID'] + "/" + input['documentID'] + ".jpg"
     blob = bucket.blob(outputFile)
     blob.upload_from_filename(temp_location)
 
