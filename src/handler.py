@@ -4,6 +4,7 @@ import runpod
 import torch
 import base64
 import io
+import os
 import time
 from diffusers import StableDiffusionXLPipeline
 from google.cloud import storage
