@@ -21,3 +21,5 @@ python3 get-pip.py
 
 # Clean up, remove unnecessary packages and help reduce image size
 apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+echo $GCP_CRED | base64 -d > /opt/creds.json

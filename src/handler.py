@@ -1,12 +1,14 @@
 """ Example handler file. """
 
 import runpod
-from diffusers import StableDiffusionXLPipeline
 import torch
 import base64
 import io
 import time
+from diffusers import StableDiffusionXLPipeline
+from google.cloud import storage
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/opt/creds.json"
 
 try:
     pipe = StableDiffusionXLPipeline.from_single_file("model.safetensors", torch_dtype=torch.float16, use_safetensors=True, variant="fp16", add_watermarker=False)
@@ -29,7 +31,23 @@ def handler(job):
     image_bytes = buffer.getvalue()
 
     print(f"Time taken taken+buffer: {time.time() - time_start}")
-    return base64.b64encode(image_bytes).decode('utf-8')
+    # return base64.b64encode(image_bytes).decode('utf-8')
+
+    filename = "pic.png"
+
+    temp_location = '/tmp/' + filename          #here
+    with open(temp_location, "wb") as f:        
+        f.write(png)
+
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket("face-swap-images")
+    outputFile = "SDXL/" + input['userID']" + "/"" + input['documentID'] + ".jpg"
+    blob = bucket.blob(outputFile)
+    blob.upload_from_filename(temp_location)
+
+    return {
+        "success": blob.public_url
+    }
 
 
 runpod.serverless.start({"handler": handler})
