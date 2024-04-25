@@ -21,6 +21,5 @@ ADD src .
 RUN wget https://civitai.com/api/download/models/274815 -O model.safetensors
 
 RUN python3.11 /handler.py
-CMD /bin/bash -u /start.sh
 CMD python3.11 -u /handler.py
 
