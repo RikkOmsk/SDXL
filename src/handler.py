@@ -38,7 +38,7 @@ def handler(job):
 
     temp_location = '/tmp/' + filename          #here
     with open(temp_location, "wb") as f:        
-        f.write(base64.b64decode(image_bytes))
+        f.write(base64.b64encode(image_bytes).decode('utf-8'))
 
     storage_client = storage.Client()
     bucket = storage_client.get_bucket("face-swap-images")
