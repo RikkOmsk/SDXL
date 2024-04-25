@@ -11,7 +11,6 @@ FROM runpod/base:0.4.0-cuda11.8.0
 COPY builder/requirements.txt /requirements.txt
 RUN python3.11 -m pip install --upgrade pip && \
     python3.11 -m pip install --upgrade -r /requirements.txt --no-cache-dir && \
-    python3.11 -m pip install --no-cache-dir runpod && \
     python3.11 -m pip install --no-cache-dir google-cloud && \
     python3.11 -m pip install --upgrade google-cloud-storage && \
     rm /requirements.txt
@@ -21,4 +20,7 @@ RUN python3.11 -m pip install --upgrade pip && \
 ADD src .
 RUN wget https://civitai.com/api/download/models/274815 -O model.safetensors
 
-ENTRYPOINT /start.sh 
+RUN /bin/bash /start.sh
+RUN python3.11 /handler.py
+CMD python3.11 -u /handler.py
+
