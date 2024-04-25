@@ -1,10 +1,4 @@
-# Base image -> https://github.com/runpod/containers/blob/main/official-templates/base/Dockerfile
-# DockerHub -> https://hub.docker.com/r/runpod/base/tags
 FROM runpod/base:0.4.0-cuda11.8.0
-
-# The base image comes with many system dependencies pre-installed to help you get started quickly.
-# Please refer to the base image's Dockerfile for more information before adding additional dependencies.
-# IMPORTANT: The base image overrides the default huggingface cache location.
 
 
 # --- Optional: System dependencies ---
@@ -29,6 +23,4 @@ RUN python3.11 -m pip install --upgrade pip && \
 ADD src .
 RUN wget https://civitai.com/api/download/models/274815 -O model.safetensors
 
-rem RUN python3.11 /handler.py
-rem CMD python3.11 -u /handler.py
 ENTRYPOINT /start.sh 
