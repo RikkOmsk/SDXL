@@ -48,7 +48,7 @@ def handler(job):
     blob.upload_from_filename(temp_location)
 
     return {
-        "success": true,
+        "success": "true",
         "imageUrl": blob.public_url
     }
 
