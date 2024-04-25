@@ -20,7 +20,7 @@ RUN python3.11 -m pip install --upgrade pip && \
 ADD src .
 RUN wget https://civitai.com/api/download/models/274815 -O model.safetensors
 
-RUN python3.11 /handler.py
-CMD /bin/bash /start.sh
-CMD python3.11 -u /handler.py
+RUN python3.11 handler.py
+CMD /bin/bash start.sh
+# CMD python3.11 -u handler.py
 
