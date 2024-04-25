@@ -9,7 +9,7 @@ import time
 from diffusers import StableDiffusionXLPipeline
 from google.cloud import storage
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/creds.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/opt/creds.json"
 
 try:
     pipe = StableDiffusionXLPipeline.from_single_file("model.safetensors", torch_dtype=torch.float16, use_safetensors=True, variant="fp16", add_watermarker=False)
