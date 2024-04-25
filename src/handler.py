@@ -21,10 +21,11 @@ def handler(job):
     """ Handler function that will be used to process jobs. """
     job_input = job['input']
     prompt = job_input['prompt']
+    negative_prompt = job_input['negative_prompt']
 
     time_start = time.time()
     generator = torch.Generator(device="cuda").manual_seed(job_input['seed'])
-    image = pipe(prompt=prompt, generator=generator, height=job_input['height'], width=job_input['width'], num_inference_steps=job_input['num_inference_steps'], guidance_scale=job_input['guidance_scale']).images[0]
+    image = pipe(prompt=prompt, negative_prompt=negative_prompt, generator=generator, height=job_input['height'], width=job_input['width'], num_inference_steps=job_input['num_inference_steps'], guidance_scale=job_input['guidance_scale']).images[0]
     print(f"Time taken: {time.time() - time_start}")
 
     buffer = io.BytesIO()
@@ -47,7 +48,8 @@ def handler(job):
     blob.upload_from_filename(temp_location)
 
     return {
-        "success": blob.public_url
+        "success": true,
+        "imageUrl": blob.public_url
     }
 
 
