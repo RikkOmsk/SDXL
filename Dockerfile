@@ -19,7 +19,8 @@ RUN python3.11 -m pip install --upgrade pip && \
 # Add src files (Worker Template)
 ADD src .
 # RUN wget https://civitai.com/api/download/models/274815 -O model.safetensors
-RUN wget https://civitai.com/api/download/models/764940 -O model.safetensors
+RUN wget https://civitai.com/api/download/models/456194 -O model.safetensors
+
 
 
 RUN python3.11 handler.py
